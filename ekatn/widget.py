@@ -9,9 +9,6 @@ testfile = 'encheiridion.txt'
 with open(testfile, encoding='utf8') as tf:
  tst = tf.read()
 
-with open('__pycache__/blessedtst.cpython-310.pyc', mode='rb') as tf:
- fa = tf.read()
-
 terminal = blessed.Terminal()
 
 def echo(toprint):
@@ -238,6 +235,10 @@ class Head():
   self.mv_x(s)
   return s, e
 
+ def find_from(self, pattern, start):
+  s, e = self.track.find_from(pattern, start)
+  return s, e
+
  def insert_cursor_at(self, lista, pos):
   lista[pos] = terminal.reverse(lista[pos])
   return lista
@@ -281,59 +282,79 @@ class HeadArray():
  def rotate_index_to_half_of_list(self, index):
   return index - len(self.headarr) //2
 
- def advance_all_heads_by_distance(self, distance):
+ def distance_advancement_list(self, distance):
   start = self.get_target().x
+  retn = []
   for i,head in enumerate(self.headarr):
-   head.mv_x(start + (distance * self.rotate_index_to_half_of_list(i)))
-  #self.set_target_first()
+   retn.append(start + (distance * self.rotate_index_to_half_of_list(i)))
+  return retn
 
- def advance_all_heads_by_pattern(self, pattern):
+ def move_to_positions(self, distlist):
+  for dt, hd in zip(distlist, self.headarr):
+   hd.mv_x(dt)
+
+ def advance_all_heads_by_distance(self, distance):
+  self.move_to_positions(self.distance_advancement_list(distance))
+
+ def pattern_advancement_list(self, pattern):
   # from the half of list, get the self.headarr[n] 
   start = self.get_target().x
+  retn = [start]
   for head in self.headarr:
    try:
-    beg, end = head.mv_find_from(pattern, start)
+    beg, end = head.find_from(pattern, start)
    except AttributeError:
     end = 0
    start = end
-  #self.set_target_first()
+   retn.append(beg)
+  return retn
+
+ def advance_all_heads_by_pattern(self, pattern):
+  self.move_to_positions(self.pattern_advancement_list(pattern))
 
  def get_headnum(self):
   return len(self.headarr)
 
- def get_nth_head(self, n):
-  return self.headarr[n]
-
  def get_target(self):
   return self.headarr[self.target_head]
 
- def set_target_next(self):
-  self.target_head += 1
-  self.target_head = self.target_head % self.get_headnum()
-
- def set_target_previous(self):
-  self.target_head += -1
-  self.target_head = self.target_head % self.get_headnum()
-
- def set_target_first(self):
-  self.target_head = 0
-
- def set_target_middle(self):
-  self.target_head = self.rotate_index_to_half_of_list(-1) % self.get_headnum()
-
- def set_target_last(self):
-  self.target_head = -1
-  self.target_head = self.target_head % self.get_headnum()
-
  def set_target(self, target_index):
   self.target_head = target_index % self.get_headnum()
+
+ def set_target_next(self):
+  self.set_target(self.target_head + 1)
+
+ def set_target_previous(self):
+  self.set_target(self.target_head - 1)
+
+ def set_target_middle(self):
+  self.set_target(self.rotate_index_to_half_of_list(-1))
+
+ def set_target_last(self):
+  self.set_target(-1)
+
+ def background(self, graynum, fat):
+  backd = terminal.on_color_rgb(graynum, graynum, graynum)
+  return backd + fat + terminal.normal
+
+ def select_background(self, index, fat):
+  rele = self.rotate_index_to_half_of_list(index)
+  retn = ''
+  if rele == 0:
+   retn = self.background(45, fat)
+  elif rele % 2 == 0:
+   retn = self.background(70, fat)
+  else:
+   retn = self.background(90, fat)
+  return retn
 
  def render_all(self, size):
   def is_target(i):
    return i == self.target_head
   retn = []
   for i in range(self.get_headnum()):
-   retn.append(self.headarr[i].render(size, is_target(i)))
+   line = self.headarr[i].render(size, is_target(i))
+   retn.append(self.select_background(i, line))
   return retn
 
 def ex_mode(buffr='', prompt=':'):
@@ -354,18 +375,23 @@ def ex_mode(buffr='', prompt=':'):
    echo(k)
   return buffr
 
+from blessedtst import ekatn, rendr, prerendr
 
-def main(infile):
+def renderizador(lista):
+ retn = []
+ for i in lista:
+  retn.append(rendr(ekatn(i)))
+ return retn 
 
- from blessedtst import ekatn, rendr, prerendr
+def down_to_closest_odd(num):
+ offset = (num - 1) % 2
+ return num - offset
+
+def main(infile, renderer=None):
+
  from kairos import timer_resolution
- def renderizador(lista):
-  retn = []
-  for i in lista:
-   retn.append(rendr(ekatn(i)))
-  return retn 
 
- heads = HeadArray(terminal.height - 1, infile, renderizador)
+ heads = HeadArray(down_to_closest_odd(terminal.height - 1), infile, renderer)
  heads.advance_all_heads_by_distance(terminal.width)
 
  with terminal.fullscreen(), terminal.hidden_cursor(), terminal.cbreak():
@@ -392,8 +418,8 @@ def main(infile):
     heads.set_target_last()
 
    # I like this: going '< on the first like takes you to the last line. It loops.
+   # move the target line to the home position, advancing all the heads in the process
    elif ky == '<':
-    heads.get_target().mv_step(terminal.width)
     heads.advance_all_heads_by_distance(terminal.width)
 
    elif ky == ':':
@@ -405,8 +431,6 @@ def main(infile):
 
    elif ky == '>':
     heads.advance_all_heads_by_pattern(pattern)
-     
-
 
    #Tag optimization: acumulate all changes to terminal to take advantage of the print buffer
    cumulative = ""
