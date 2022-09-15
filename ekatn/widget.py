@@ -338,14 +338,25 @@ class HeadArray():
   return backd + fat + terminal.normal
 
  def select_background(self, index, fat):
-  rele = self.rotate_index_to_half_of_list(index)
+  rele = abs(self.rotate_index_to_half_of_list(index))
   retn = ''
+  mo = rele % 4
+  ma = rele % 8
+  me = rele % 32
+
   if rele == 0:
-   retn = self.background(45, fat)
-  elif rele % 2 == 0:
-   retn = self.background(70, fat)
+   retn = self.background(110, fat)
+
+  elif me == 0 or me == 31:
+   retn = self.background(100, fat)
+
+  elif ma == 0 or ma == 7:
+   retn = self.background(80, fat)
+
+  elif mo == 1 or mo == 2:
+   retn = self.background(0, fat)
   else:
-   retn = self.background(90, fat)
+   retn = self.background(30, fat)
   return retn
 
  def render_all(self, size):
