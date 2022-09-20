@@ -78,9 +78,59 @@ def inherit(lsta, lstb):
    return retn + lsta[i:]
  return retn
 
+"""
+[(parent,style) [(child,style) chile] atom style]
+
+TODO:
+
+get the first style, the root style, from the style string. the remaining style string should still be valid. like
+ [(ffffff,000000) white over black [(,310000) white over dark red]] ->
+ (ffffff,000000) [() white over black [(,310000) white over dark red]] or
+ (ffffff,000000) [(ffffff,000000) white over black [(,310000) white over dark red]]
+the point is this: I don't need a special case for when the stack is empty, since the stack never starts empty.
+
+create the next styledish by inheriting from the previous styledish
+ stack: (ffffff,000000,1,0) (,,10,1) &
+ stack: (ffffff,000000,1,0) (ffffff,ffffff,10,1)
+
+render the stylestring into ansi escape codes
+ [(ff0000,222222,1) bold red over dark gray] ->
+ \033[38;2;255;0;0m\033[48;2;22;22;22mbold red over dark gray
+
+render current style on entering nesting
+ (ffffff,000000,1) [(,,0,1) non bold italicized]
+ (ffffff,000000,1) (ffffff,000000,0,1)
+                   non bold italicized
+
+restore previous style on exit nesting
+ (ffffff,000000,1) [(,,0,1) non bold italicized] white bold
+ (ffffff,000000,1) (ffffff,000000,0,1)
+                   non bold italicized
+ white bold
+white                 black           white                 black           bold   reset  white                 black           italic                    reset  white                 black           bold
+\033[38;2;255;255;255m\033[48;2;0;0;0m\033[38;2;255;255;255m\033[48;2;0;0;0m\033[1m\033[0m\033[38;2;255;255;255m\033[48;2;0;0;0m\033[3mnon bold italicized\033[0m\033[38;2;255;255;255m\033[48;2;0;0;0m\033[1m
+
+dog, these format strings are effing long! make an optimizing renderer...
+ selective reset of characteristics: instead of blasting all style with \033[0m, undo specific styles as required
+  unbolden, unitalic, ununderlined. instead of uneverything and redo
+  (white,black,bold) (,,0,italic) ->
+  white black bold unbold italic
+ smush inherited styles
+  (white,black,bold) (,,,underlined) ->
+  white black bold underlined
+
+  white black bold white black bold underlined
+
+
+
+Glossary:
+ styledish: each level in the style stack
+ stylestring: the nested representation of a markup string, [(val,val) string string [(val) string] [(,val) string]]
+
+"""
+
 class StackRenderer():
  def __init__(self, stylestr):
-  self.stack = [['ffffff', '000000']]
 
  def make_nested_format(self, brains):
   previous = self.stack[-1]
