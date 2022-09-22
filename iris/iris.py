@@ -1,13 +1,20 @@
 
 import unittest
+import renderers
 
 #Pg lexer
 
 def behead(stylestr):
+ """Separate the style overrides from the text."""
  head, body = stylestr[1:-1].split(" ", 1)
  return head, body
 
-def member_measure(body):
+def caliper(body):
+ """Return the boundaries of the next member section.
+
+ It should detect 2 types of members: branches "[() this caliper [() no cause for fear [() not it, it doesn't hurt]]]"
+                                    and leaves " it only helps me measure how much skin you have"
+ """
  nest = 0
  start = body.find('[') 
  for i, c in enumerate(body[start:]):
@@ -19,14 +26,17 @@ def member_measure(body):
   if nest == 0:
    return start, i + 1
 
-def calipers(body):
+def body_measurements(body):
  last = 0
  ranges = [last]
- a_little_of_you = member_measure(body[last:])
+ a_little_of_you = caliper(body[last:])
  while a_little_of_you != (-1, -1):
 
   if a_little_of_you is None:
    break
+  if a_little_of_you == (-1, 1):
+   ranges.append(len(body) + 1)
+   return ranges
 
   start, step = a_little_of_you
   last += start
@@ -34,12 +44,12 @@ def calipers(body):
   last += step
   ranges.append(last)
 
-  a_little_of_you = member_measure(body[last:])
+  a_little_of_you = caliper(body[last:])
 
  return ranges
 
 def dismember(body):
- thespacebetween = calipers(body) #blue kid - the dismemberment song
+ thespacebetween = body_measurements(body) #blue kid - the dismemberment song
  cutmarks = zip(thespacebetween, thespacebetween[1:])
  so_refreshing = [body[molar:jaw] for molar,jaw in cutmarks]
  return so_refreshing # for me ;)
@@ -47,7 +57,7 @@ def dismember(body):
 def excerebrate(head):
  return head[1:-1].split(",")
 
-def butcher(stylestr):
+def cut_you_up(stylestr):
  head, body = behead(stylestr)
  brain = excerebrate(head)
  members = dismember(body)
@@ -56,10 +66,19 @@ def butcher(stylestr):
 class TestLexer(unittest.TestCase):
  def test_dismemberment(self):
   self.assertEqual(
-    butcher('[(ffffff,310000) this will be [(200,30,30) ooh!] this will be [(200,30,30) aah!] this will be [(200,30,30) absolutely [(200,0,200) whee!]]]'),
-    (['ffffff', '310000'], ['this will be ', '[(200,30,30) ooh!]', ' this will be ', '[(200,30,30) aah!]', ' this will be ', '[(200,30,30) absolutely [(200,0,200) whee!]]']))
+    cut_you_up('[(ffffff,310000) this will be [(200,30,30) ooh!] this will be [(200,30,30) aah!] this will be [(200,30,30) absolutely [(200,0,200) whee!]] this will be nice]'),
+    (['ffffff', '310000'], ['this will be ', '[(200,30,30) ooh!]', ' this will be ', '[(200,30,30) aah!]', ' this will be ', '[(200,30,30) absolutely [(200,0,200) whee!]]', ' this will be nice']))
 
 #Pg compile
+
+def wash_brains(brain):
+ retn = []
+ for i in brain:
+  if not i:
+   retn.append(None)
+  else:
+   retn.append(i)
+ return retn
 
 def is_styled_nest(member):
  return member[0] == '[' and member[-1] == ']'
@@ -126,25 +145,143 @@ dog, these format strings are effing long! make an optimizing renderer...
 Glossary:
  styledish: each level in the style stack
  stylestring: the nested representation of a markup string, [(val,val) string string [(val) string] [(,val) string]]
+ basal: closer to the root
+ apical: closer to the leafs
 
 """
 
+"""
+if current_stylenest is empty:
+ clean your stack changes
+ 
+
+if  the current element  is  a stylenest:
+ save its styling info into the stylestacks
+ save the rest of the current stylenest to the styletree stack
+ current_stylenest = dismember(current element)
+else:
+ render it with the current style
+"""
+
+tstsave = """[(ffffff,000000,1) this is no orthodox [(,555555) beheading] I'm cuting you [(ff0000) up]]"""
+class StackUnderflow(BaseException):
+ pass
+
 class StackRenderer():
- def __init__(self, stylestr):
+ def __init__(self, styletree):
+  """
+  the styletree must be in string form, not yet lexed. So you start by lexing the current element in the element list, which is just one element long: the starting style tree.
+  """
 
- def make_nested_format(self, brains):
-  previous = self.stack[-1]
-  return previous
+  self.styletree = styletree
 
- def compile(self, stylestr):
-  brains, members = butcher(stylestr)
-  self.stack.append(self._make_nested_format(brains))
-  print(self.stack)
+ def top(self, stack):
+  try:
+   retn = stack[-1]
+  except IndexError:
+   raise StackUnderflow
+  return retn 
+
+ def save_styles(self, stackarray, brains):
+  """Initialize the stackarray with the style elements
+
+  incoming: ('ffffff','000000','1','1')
+  outgoing: (True,True,True,True)
+  side effect: [['ffffff', None], ['000000', None], ['1', None], ['1', None]]
+
+  incoming: ('ff0000', None, '0')
+  outgoing: (True,False,True)
+  side effect: [['ffffff', None, 'ff0000', None], ['000000', None], ['1', None, '0', None], ['1', None]]
+
+  incoming: overwrite_styles
+  outgoing: updated style use stack array
+
+  The None in each stack array is a use flag: if the top of the stack is None, the underlying style has not been applied in this sequence. Then it is rendered. If there is a stack value on top of the stack, that value is in effect right now.
+  """
+  for stystack, stye in zip(stackarray, brains):
+
+   #if the style has been applied, unapply it
+   try:
+    if self.top(stystack) is not None:
+     stystack.append(None)
+   except StackUnderflow:
+    # if the stack is empty, there is nothing to unapply
+    pass
+
+   #if this branch is overwriting the basal style, add and unapply current style
+   if stye is not None:
+    stystack.append(stye)
+    stystack.append(None)
+
+  return [True if i is not None else False for i in brains] #True for stacks that were modified
+
+ def apply_styles(self, target, stylestacks, renderfuncs):
+  stye = ""
+  for ste, fn in zip(stylestacks, renderfuncs):
+   sye = ste.pop()
+   if sye is None:
+    sye = ste.pop()
+    stye += fn(sye)
+   ste.append(sye)
+  return stye + target
+
+ def compile_step(self, styleStacks, styletree):
+  styles, members = cut_you_up(styletree)
+  undoes = self.save_styles(styleStacks, wash_brains(styles))
+  return undoes, members
+
+ def compe(self, stylestr, render_functions):
+  brains, members = cut_you_up(stylestr)
+  pending = []
+  elts = []
+  styleStacks = [[] for i in brains]
+  undoStylesStack = []
+  retn = ""
+
+  while True:
+   
+   if not elts:
+    if stylestr is None:
+     stylestr, *elts = pending.pop()
+     continue
+    undo, elts = self.compile_step(styleStacks, stylestr)
+    stylestr = None
+   if not is_styled_nest(elts[0]):
+    retn += self.apply_styles(elts[0], styleStacks, render_functions)
+    del elts[0]
+   else:
+    stylestr = elts[0]
+    pending.append(elts[1:])
+    elts = []
+
+   print('retn: ', [retn], '\n',
+         'undo: ', undo, '\n',
+         'stylestr: ', stylestr, '\n',
+         'elts: ', elts, '\n',
+         'sstack: ', styleStacks, '\n',
+         'pending: ', pending, '\n',
+         sep='', end='\n')
+   input()
+    
+
+   #elt = elements_list[0]
+   #if is_styled_nest(elt):
+    #pending_branches.append(elements_list[1:])
+    #nbrains, nmembers = cut_you_up(elt)
+    #elements_list = nmembers.copy()
+    #continue
+   #else:
+    #retn += self.apply_styles(elt, styleStacks, render_functions)
+
+   #print("ss:", styleStacks, "\nundostack:", undoStylesStack, "\nb,m: ", brains, members)
+
+ def __repr__(self):
+  return str(self.styletree)
 
 
 class TestCompile(unittest.TestCase):
  def test_discriminate_nested(self):
-  brains, members = butcher('[(ffffff,310000) this will be [(200,30,30) ooh!] this will be [(200,30,30) aah!] this will be [(200,30,30) absolutely [(200,0,200) whee!]]]')
+  brains, members = cut_you_up('[(ffffff,310000) this will be [(200,30,30) ooh!] this will be [(200,30,30) aah!] this will be [(200,30,30) absolutely [(200,0,200) whee!]]]')
   self.assertEqual([is_styled_nest(i) for i in members], [False, True, False, True, False, True])
 
 if __name__ == "__main__":
