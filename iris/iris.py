@@ -52,7 +52,7 @@ def dismember(body):
  thespacebetween = body_measurements(body) #blue kid - the dismemberment song
  cutmarks = zip(thespacebetween, thespacebetween[1:])
  so_refreshing = [body[molar:jaw] for molar,jaw in cutmarks]
- return so_refreshing # for me ;)
+ return [i for i in so_refreshing if i] # for me ;)
 
 def excerebrate(head):
  return head[1:-1].split(",")
@@ -163,7 +163,14 @@ else:
  render it with the current style
 """
 
-tstsave = """[(ffffff,000000,1) this is no orthodox [(,555555) beheading] I'm cuting you [(ff0000) up]]"""
+tstsave = """[(ffffff,000000,1) this is no orthodox [(,555555) beheading] [(,,0) I'm cuting you [(ff0000) up] cutting you up] cutting you up will be so refreshing to me]"""
+
+tstcompilation = [
+        '[(ff0000,440000,1) bold red on dark red]',
+        '[(00ff00,440000,1) Im green over dark red and bold! [(0000ff) but I feel all blue]]',
+        '[(ff00ff,000000) [(,bbbb00) magenta over yellow] [(,00bbbb) magenta over cyan] [(,0000bb) magenta over blue] just magenta]',
+        '[(ffffff,007700,0,0) white over green darkish [(,,1) Im just bold [(,,,1) Im bold and italic!] just bold again] Ive been restored to my previous glory]'
+        ]
 class StackUnderflow(BaseException):
  pass
 
@@ -200,6 +207,10 @@ class StackRenderer():
   """
   for stystack, stye in zip(stackarray, brains):
 
+   #if the style is not overwritten, do nothing
+   if stye is None:
+    continue
+
    #if the style has been applied, unapply it
    try:
     if self.top(stystack) is not None:
@@ -225,55 +236,42 @@ class StackRenderer():
    ste.append(sye)
   return stye + target
 
+ def clean_styles_stack(self, stylestacks, undoes):
+  for sk, ud in zip(stylestacks, undoes):
+   if ud:
+    sk.pop()
+
  def compile_step(self, styleStacks, styletree):
   styles, members = cut_you_up(styletree)
   undoes = self.save_styles(styleStacks, wash_brains(styles))
   return undoes, members
 
- def compe(self, stylestr, render_functions):
+ def compa(self, stylestr, render_functions):
   brains, members = cut_you_up(stylestr)
   pending = []
-  elts = []
   styleStacks = [[] for i in brains]
   undoStylesStack = []
+  undo, body = self.compile_step(styleStacks, stylestr)
+  elts = body
   retn = ""
 
   while True:
    
-   if not elts:
-    if stylestr is None:
-     stylestr, *elts = pending.pop()
-     continue
-    undo, elts = self.compile_step(styleStacks, stylestr)
-    stylestr = None
-   if not is_styled_nest(elts[0]):
-    retn += self.apply_styles(elts[0], styleStacks, render_functions)
-    del elts[0]
+   if elts:
+    if not is_styled_nest(elts[0]):
+     retn += self.apply_styles(elts[0], styleStacks, render_functions)
+     del elts[0]
+    else:
+     pending.append(elts[1:])
+     undo, body = self.compile_step(styleStacks, elts[0])
+     elts = body
+     undoStylesStack.append(undo)
+
+   elif pending:
+    elts = pending.pop()
+    self.clean_styles_stack(styleStacks, undoStylesStack.pop())
    else:
-    stylestr = elts[0]
-    pending.append(elts[1:])
-    elts = []
-
-   print('retn: ', [retn], '\n',
-         'undo: ', undo, '\n',
-         'stylestr: ', stylestr, '\n',
-         'elts: ', elts, '\n',
-         'sstack: ', styleStacks, '\n',
-         'pending: ', pending, '\n',
-         sep='', end='\n')
-   input()
-    
-
-   #elt = elements_list[0]
-   #if is_styled_nest(elt):
-    #pending_branches.append(elements_list[1:])
-    #nbrains, nmembers = cut_you_up(elt)
-    #elements_list = nmembers.copy()
-    #continue
-   #else:
-    #retn += self.apply_styles(elt, styleStacks, render_functions)
-
-   #print("ss:", styleStacks, "\nundostack:", undoStylesStack, "\nb,m: ", brains, members)
+    return retn
 
  def __repr__(self):
   return str(self.styletree)
