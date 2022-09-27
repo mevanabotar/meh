@@ -1,13 +1,12 @@
 
-import blessed
 from random import randint
 import re
 
+import blessed
 
-"Get the test file"
-testfile = 'encheiridion.txt'
-with open(testfile, encoding='utf8') as tf:
- tst = tf.read()
+from mytests.blessedtst import ekatn, rendr, prerendr
+from mytests.kairos import timer_resolution
+
 
 terminal = blessed.Terminal()
 
@@ -386,8 +385,6 @@ def ex_mode(buffr='', prompt=':'):
    echo(k)
   return buffr
 
-from blessedtst import ekatn, rendr, prerendr
-
 def renderizador(lista):
  retn = []
  for i in lista:
@@ -400,7 +397,6 @@ def down_to_closest_odd(num):
 
 def main(infile, renderer=None):
 
- from kairos import timer_resolution
 
  heads = HeadArray(down_to_closest_odd(terminal.height - 1), infile, renderer)
  heads.advance_all_heads_by_distance(terminal.width)

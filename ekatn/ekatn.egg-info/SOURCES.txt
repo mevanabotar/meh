@@ -1,0 +1,14 @@
+setup.cfg
+setup.py
+ekatn.egg-info/PKG-INFO
+ekatn.egg-info/SOURCES.txt
+ekatn.egg-info/dependency_links.txt
+ekatn.egg-info/requires.txt
+ekatn.egg-info/top_level.txt
+mytests/blessedtst.py
+mytests/kairos.py
+mytests/patterns.py
+mytests/ribbon.py
+mytests/rrload.py
+mytests/stylelang.py
+test/test_manually_terminal.py

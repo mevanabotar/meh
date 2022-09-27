@@ -1,6 +1,18 @@
 
-import unittest
-import renderers
+import re
+
+#Pg escape hack
+
+def escapehack(rawstr):
+ rawstr = re.sub(r"\[", r"<{<", rawstr)
+ rawstr = re.sub(r"\]", r">}>", rawstr)
+ return rawstr
+
+def unescapehack(rawstr):
+ rawstr = re.sub( r"<{<", r"[", rawstr)
+ rawstr = re.sub( r">}>", r"]", rawstr)
+ return rawstr
+
 
 #Pg lexer
 
@@ -14,6 +26,8 @@ def caliper(body):
 
  It should detect 2 types of members: branches "[() this caliper [() no cause for fear [() not it, it doesn't hurt]]]"
                                     and leaves " it only helps me measure how much skin you have"
+ You should be able to escape brackets:
+                                               "[() on the topmost layer of fat \[I feel that this is backwards: the fat underneath the topmost layer of skin... but that might be harder to rhyme\]. But I won't make that incision, till you are nice and numb]"
  """
  nest = 0
  start = body.find('[') 
@@ -25,6 +39,9 @@ def caliper(body):
 
   if nest == 0:
    return start, i + 1
+
+def is_styled_nest(member):
+ return member[0] == '[' and member[-1] == ']'
 
 def body_measurements(body):
  last = 0
@@ -63,12 +80,6 @@ def cut_you_up(stylestr):
  members = dismember(body)
  return brain, members
 
-class TestLexer(unittest.TestCase):
- def test_dismemberment(self):
-  self.assertEqual(
-    cut_you_up('[(ffffff,310000) this will be [(200,30,30) ooh!] this will be [(200,30,30) aah!] this will be [(200,30,30) absolutely [(200,0,200) whee!]] this will be nice]'),
-    (['ffffff', '310000'], ['this will be ', '[(200,30,30) ooh!]', ' this will be ', '[(200,30,30) aah!]', ' this will be ', '[(200,30,30) absolutely [(200,0,200) whee!]]', ' this will be nice']))
-
 #Pg compile
 
 def wash_brains(brain):
@@ -80,9 +91,6 @@ def wash_brains(brain):
    retn.append(i)
  return retn
 
-def is_styled_nest(member):
- return member[0] == '[' and member[-1] == ']'
-
 """
 [(parent,style) [(child,style) chile] atom style]
 """
@@ -90,6 +98,7 @@ class StackUnderflow(BaseException):
  pass
 
 class StackRenderer():
+
  def __init__(self, styletree):
   """
   the styletree must be in string form, not yet lexed. So you start by lexing the current element in the element list, which is just one element long: the starting style tree.
@@ -141,7 +150,15 @@ class StackRenderer():
 
   return [True if i is not None else False for i in brains] #True for stacks that were modified
 
- def apply_styles(self, target, stylestacks, renderfuncs):
+ def apply_styles(self, target, stylestacks, renderfuncs, tarmod=lambda x: x):
+  """Render the target string applying the styles saved in stylestacks according to renderfuncs.
+
+  The target is just a normal string.
+  stylestacks is an interesting datastructure: A list of stacks. Each stack represents a style, and it matches the rendering function in renderfuncs with the same index. When a new style in the styletree is encountered, its pushed into the stylestack, then a None value that means "the underlying style has yet to be applied". This is how I save on reapplying styles whenever we go up a nesting level when it is still in effect.
+  The renderfuncs take in the style as specified in a stylestack and convert it into a format acceptable by the target renderer. It creates the ansi codes. It might be more powerful if it could modify the target function too, but then you would need some logic to combine the returning targets without repetition?
+  I'll just add an optional function to modify the target.
+  """
+
   stye = ""
   for ste, fn in zip(stylestacks, renderfuncs):
    sye = ste.pop()
@@ -149,7 +166,7 @@ class StackRenderer():
     sye = ste.pop()
     stye += fn(sye)
    ste.append(sye)
-  return stye + target
+  return stye + tarmod(target)
 
  def clean_styles_stack(self, stylestacks, undoes):
   for sk, ud in zip(stylestacks, undoes):
@@ -161,7 +178,8 @@ class StackRenderer():
   undoes = self.save_styles(styleStacks, wash_brains(styles))
   return undoes, members
 
- def compa(self, stylestr, render_functions):
+ def compa(self, render_functions):
+  stylestr = self.styletree
   brains, members = cut_you_up(stylestr)
   pending = []
   styleStacks = [[] for i in brains]
@@ -191,33 +209,3 @@ class StackRenderer():
  def __repr__(self):
   return str(self.styletree)
 
-
-
-class TestCompile(unittest.TestCase):
- def test_discriminate_nested(self):
-  brains, members = cut_you_up('[(ffffff,310000) this will be [(200,30,30) ooh!] this will be [(200,30,30) aah!] this will be [(200,30,30) absolutely [(200,0,200) whee!]]]')
-  self.assertEqual([is_styled_nest(i) for i in members], [False, True, False, True, False, True])
-
- def test_ansi_compilation(self):
-  import renderers 
-  rendfunctions = [renderers.render_fore_color, renderers.render_back_color, renderers.render_bold, renderers.render_italic]
-  values = [
-        """[(ffffff,000000,1) this is no orthodox [(,555555) beheading] [(,,0) I'm cuting you [(ff0000) up] cutting you up] cutting you up will be so refreshing to me]""",
-        '[(ff0000,440000,1) bold red on dark red]',
-        '[(00ff00,440000,1) Im green over dark red and bold! [(0000ff) but I feel all blue]]',
-        '[(ff00ff,000000) [(,bbbb00) magenta over yellow] [(,00bbbb) magenta over cyan] [(,0000bb) magenta over blue] just magenta]',
-        '[(ffffff,007700,0,0) white over green darkish [(,,1) Im just bold [(,,,1) Im bold and italic!] just bold again] Ive been restored to my previous glory]'
-        ]
-
-  results = [
-        "\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m\x1b[1mthis is no orthodox \x1b[48;2;85;85;85mbeheading\x1b[48;2;0;0;0m \x1b[22mI'm cuting you \x1b[38;2;255;0;0mup\x1b[38;2;255;255;255m cutting you up\x1b[1m cutting you up will be so refreshing to me",
-        '\x1b[38;2;255;0;0m\x1b[48;2;68;0;0m\x1b[1mbold red on dark red',
-        '\x1b[38;2;0;255;0m\x1b[48;2;68;0;0m\x1b[1mIm green over dark red and bold! \x1b[38;2;0;0;255mbut I feel all blue',
-        '\x1b[38;2;255;0;255m\x1b[48;2;187;187;0mmagenta over yellow\x1b[48;2;0;0;0m \x1b[48;2;0;187;187mmagenta over cyan\x1b[48;2;0;0;0m \x1b[48;2;0;0;187mmagenta over blue\x1b[48;2;0;0;0m just magenta',
-        '\x1b[38;2;255;255;255m\x1b[48;2;0;119;0m\x1b[22m\x1b[23mwhite over green darkish \x1b[1mIm just bold \x1b[3mIm bold and italic!\x1b[23m just bold again\x1b[22m Ive been restored to my previous glory'
-        ]
-  obj = StackRenderer('not important')
-  self.assertEqual([obj.compa(i, rendfunctions) for i in values], results)
-
-if __name__ == "__main__":
- unittest.main()
