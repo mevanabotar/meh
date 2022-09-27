@@ -2,6 +2,13 @@
 #patterns
 000) once a pattern has been searched, advance all heads by distance from each's current position
      right now, advancing the current cursor by distance just sets the current position as home, and all cursors align themselves continuously, not relative from their last position.
+001) patterns buffer
+
+#optimizations
+000) maybe prerender the entire file, because someday I'll have a style pattern that will depend on far away contexts, contexts outside the current file string
+
+#style
+000) each level adds its own stylings: the HeadArr adds the navigation styles, the LoopRibbon adds the text file specific style. How can I unify these style inputs so they can be given all dynamically in a single level, and each goes to the appropriate level? like: [HeadArr style functions, Head style functions, LoopRibbon style functions] is just a list given to the interfacing function.
 
 6) jump to pattern match
 7) jump back and forth on pattern matches

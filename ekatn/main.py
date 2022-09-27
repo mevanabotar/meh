@@ -27,7 +27,6 @@ def keywity(context_man):
 
 #Pg cursor
 
-#Tag optimization: reduce the number of calls to render by memoizing already rendered values
 class LoopRibbon():
  
  def __init__(self, source, renderer):
@@ -56,14 +55,18 @@ class LoopRibbon():
   return retn
 
  def render(self, start, delta):
+
   if self.renderer is not None:
+   #Tag optimization: reduce the number of calls to render by memoizing already rendered values
    prerendered = self.rendered.get_slice(start, delta) 
    if prerendered is not None:
     return prerendered
+
    hererendered = self.renderer(self.slice(start, delta))
    self.rendered.add_slice(start, delta, hererendered)
    self.rendered.consolidate()
    return hererendered 
+
   return self.mapping(self.slice(start, delta))
 
  def duplicate(self):
@@ -249,7 +252,6 @@ def down_to_closest_odd(num):
  return num - offset
 
 def main(infile, renderer=None):
-
 
  heads = HeadArray(down_to_closest_odd(terminal.height - 1), infile, renderer)
  heads.advance_all_heads_by_distance(terminal.width)
