@@ -1,4 +1,5 @@
 
+#Pg imports
 from random import randint
 import re
 
@@ -6,15 +7,18 @@ import blessed
 
 from mytests.blessedtst import ekatn, rendr, prerendr
 from mytests.kairos import timer_resolution
+from memoization import Memo
 
+
+#Pg begin
 
 terminal = blessed.Terminal()
+
+#Pg helpers
 
 def echo(toprint):
  """Print to terminal, always flushing and end in ''."""
  print(toprint, end='', flush=True)
-
-#Pg helpers
 
 def keywity(context_man):
  """Read a key pressed in the given context. Used for debugging."""
@@ -22,131 +26,6 @@ def keywity(context_man):
   return terminal.inkey()
 
 #Pg cursor
-"""TODO
-
-6) jump to pattern match
-7) jump back and forth on pattern matches
-a) multiple pattern search
-b) highlight different pattern searches with different markups
-c) ex command goto
-d) the ex command buffer should itself be a Head()
-e) highlight the window on which the ex mode is operating
-
-8) print many lines of the text, each a window into a newline of the text
-9) select a window to move in
-10) align all windows on `pattern`
-
-11) modify the text buffer
-12) undo the modification
-13) save modifications to a file
-14) update all windows when you modify the text
-15) update certain windows when you modify the text
-16) update selected windows
-17) select windows by number
-18) print window number
-19) group selected windows
-
-20) markup text
-21) make your own markup for the current window
-22) select a premade markup for the current window
-23) search by markup
-"""
-
-#Pg T0.1
-
-class Memo():
- def __init__(self):
-  self.tst = "En la hora de angustia y de luz vaga, en su Golem los ojos detenia. Quien nos diria lo que sentia Dios, al mirar a su rabino en Praga?"
-  self.rangehash = {}
-
- def add_slice(self, start, delta, vals):
-  self.rangehash[(start,delta)] = vals
-
- def add_tst(self, start, delta, source):
-  self.add_slice(start, delta, source[start:start+delta])
-
- def get_slice(self, start, delta):
-  for ky in self.rangehash:
-   st, da = ky
-   if st <= start and (start + delta) <= da:
-    return self.rangehash[ky][start:start+delta]
-  return None
-
- def fuse(self, cumulative, current):
-  #[(start, delta), value]
-  cumu_start, cumu_delta = cumulative[0]
-  cumu_val = cumulative[1]
-  curr_start, curr_delta = current[0]
-  curr_val = current[1]
-
-  new_start = cumu_start
-  difference = curr_start - cumu_start
-  new_delta = difference + curr_delta
-  return (new_start, new_delta) , cumu_val[0: difference] + curr_val
-
- def is_within(self, cumulative, current):
-  cumu_start, cumu_delta = cumulative[0]
-  cumu_end = cumu_start + cumu_delta
-  curr_start, curr_delta = current[0]
-  curr_end = curr_start + curr_delta
-
-  return cumu_start <= curr_start and curr_end <= cumu_end
-
- def is_overlap(self, cumulative, current):
-  cumu_start, cumu_delta = cumulative[0]
-  cumu_end = cumu_start + cumu_delta
-  curr_start, curr_delta = current[0]
-  curr_end = curr_start + curr_delta
-
-  return cumu_start <= curr_start and curr_start <= cumu_end
-
- def consolidate(self):
-
-  if len(self.rangehash) < 1:
-   return self.rangehash
-  cumulative, *ordenado = sorted(list(self.rangehash.items()))
-  retn = {}
-
-  def save(sliced):
-   key, val = sliced
-   retn[key] = val
-
-  def following():
-   try:
-    retn = ordenado[0]
-    del ordenado[0]
-   except IndexError:
-    retn = []
-   return retn
-
-  while True:
-   
-   current = following()
-   if current:
-    if self.is_within(cumulative, current):
-     pass
-    elif self.is_overlap(cumulative, current):
-     cumulative = self.fuse(cumulative, current)
-    else:
-     save(cumulative)
-     cumulative = current
-   else:
-    save(cumulative)
-    break
-  self.rangehash = retn
-
- def __repr__(self):
-  return str(self.rangehash)
-
-atst = Memo()
-atst.add_tst(0,5,atst.tst)
-atst.add_tst(4, 10, atst.tst)
-atst.add_tst(9,20, atst.tst)
-atst.add_tst(30,10,atst.tst)
-atst.add_tst(50,2,atst.tst)
-atst.add_tst(30,5, atst.tst)
-atst.add_tst(10,5, atst.tst)
-
 
 #Tag optimization: reduce the number of calls to render by memoizing already rendered values
 class LoopRibbon():
@@ -243,24 +122,6 @@ class Head():
   return "".join(texto)
 
 # multilines
-"""
-1) have 2 cursors, each running on a different line, with different views of the file
-2) move between the two cursors to interact with them with jk
-3) make terminal.height-1 cursors, printed from top to bottom
-4) move to the bottom cursor
-5) move to the top cursor
-6) select cursors to coordinate
-7) advance all cursors by pattern (\n)
-   send to grouped cursors the same message
-
-8) highlights: color the lines based on their relative position
-
--2
--1
-0
-1
-2
-"""
 
 class HeadArray():
 

@@ -1,0 +1,45 @@
+
+#patterns
+000) once a pattern has been searched, advance all heads by distance from each's current position
+     right now, advancing the current cursor by distance just sets the current position as home, and all cursors align themselves continuously, not relative from their last position.
+
+6) jump to pattern match
+7) jump back and forth on pattern matches
+a) multiple pattern search
+b) highlight different pattern searches with different markups
+c) ex command goto
+d) the ex command buffer should itself be a Head()
+e) highlight the window on which the ex mode is operating
+
+11) modify the text buffer
+12) undo the modification
+13) save modifications to a file
+14) update all windows when you modify the text
+15) update certain windows when you modify the text
+16) update selected windows
+17) select windows by number
+18) print window number
+19) group selected windows
+
+20) markup text
+21) make your own markup for the current window
+22) select a premade markup for the current window
+23) search by markup
+
+
+1) have 2 cursors, each running on a different line, with different views of the file
+2) move between the two cursors to interact with them with jk
+3) make terminal.height-1 cursors, printed from top to bottom
+4) move to the bottom cursor
+5) move to the top cursor
+6) select cursors to coordinate
+7) advance all cursors by pattern (\n)
+   send to grouped cursors the same message
+
+8) highlights: color the lines based on their relative position
+
+-2
+-1
+0
+1
+2
