@@ -24,14 +24,6 @@ def keywity(context_man):
 #Pg cursor
 """TODO
 
-DONE
-1) have a cursor in a line with text
-2) move the cursor ahead and behind
-3) get the character under the cursor
-4) print the character under the cursor
-5) print line from cursor position
-
-
 6) jump to pattern match
 7) jump back and forth on pattern matches
 a) multiple pattern search

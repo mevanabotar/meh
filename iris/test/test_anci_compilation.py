@@ -1,6 +1,6 @@
 
 import unittest
-import helpers.renderers as renderers
+import renderers
 import pupil
 
 class TestLexer(unittest.TestCase):
