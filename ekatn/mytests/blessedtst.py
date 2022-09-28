@@ -199,3 +199,26 @@ def prerendr(number):
 def testekatn():
  for i in range(256):
   echo(rendr(ekatn(i)))
+
+def simplemap1(chars):
+ retn = []
+ for i in chars:
+  if i == '\n':
+   retn.append(term.cyan + 'n' + term.normal)
+  elif i == '\t':
+   retn.append(term.cyan + 't' + term.normal)
+  else:
+   retn.append(i)
+ return retn
+
+def incompletemap1(chars):
+ retn = []
+ for i in chars:
+  if i == '\n':
+   retn.append(term.cyan + 'n')
+  elif i == '\t':
+   retn.append(term.cyan + 't')
+  else:
+   retn.append(i)
+ return retn
+

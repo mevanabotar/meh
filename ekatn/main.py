@@ -2,10 +2,11 @@
 #Pg imports
 from random import randint
 import re
+import functools
 
 import blessed
 
-from mytests.blessedtst import ekatn, rendr, prerendr
+from mytests.blessedtst import ekatn, rendr, prerendr, simplemap1, incompletemap1
 from mytests.kairos import timer_resolution
 from memoization import Memo
 
@@ -43,17 +44,6 @@ class LoopRibbon():
   matched = patn.search(self.string, start)
   return matched.start(), matched.end()
 
- def mapping(self, chars):
-  retn = []
-  for i in chars:
-   if i == '\n':
-    retn.append(terminal.cyan + 'n' + terminal.normal)
-   elif i == '\t':
-    retn.append(terminal.cyan + 't' + terminal.normal)
-   else:
-    retn.append(i)
-  return retn
-
  def render(self, start, delta):
 
   if self.renderer is not None:
@@ -67,7 +57,7 @@ class LoopRibbon():
    self.rendered.consolidate()
    return hererendered 
 
-  return self.mapping(self.slice(start, delta))
+  return self.slice(start, delta)
 
  def duplicate(self):
   return self
@@ -102,11 +92,6 @@ class Head():
 
  def mv_right(self):
   self.mv_step(1)
-
- def mv_find_from(self, pattern, start):
-  s, e = self.track.find_from(pattern, start)
-  self.mv_x(s)
-  return s, e
 
  def find_from(self, pattern, start):
   s, e = self.track.find_from(pattern, start)
@@ -223,84 +208,89 @@ class HeadArray():
    retn.append(self.select_background(i, line))
   return retn
 
-def ex_mode(buffr='', prompt=':'):
- #capture instructions at the bottom
- with terminal.location(0, terminal.height - 1), terminal.raw():
-  echo(prompt)
-  while True:
-   k = terminal.inkey()
-   if k.name == 'KEY_ENTER': #heisenbug: you press enter, but don't exit ex mode
-    echo('\r' + u' '*terminal.width)
-    break
-   elif k.name == 'KEY_BACKSPACE':
-    if buffr:
-     buffr = buffr[:-1]
-     echo("" + u' ' + "")
-    continue
-   buffr += k
-   echo(k)
-  return buffr
-
 def renderizador(lista):
  retn = []
  for i in lista:
   retn.append(rendr(ekatn(i)))
  return retn 
 
-def down_to_closest_odd(num):
- offset = (num - 1) % 2
- return num - offset
+class VirtualTerminal():
 
-def main(infile, renderer=None):
+ def ex_mode(self, buffr='', prompt=':'):
+  #capture instructions at the bottom
+  with terminal.location(0, terminal.height - 1), terminal.raw():
+   echo(prompt)
+   while True:
+    k = terminal.inkey()
+    if k.name == 'KEY_ENTER': #heisenbug: you press enter, but don't exit ex mode
+     echo('\r' + u' '*terminal.width)
+     break
+    elif k.name == 'KEY_BACKSPACE':
+     if buffr:
+      buffr = buffr[:-1]
+      echo("" + u' ' + "")
+     continue
+    buffr += k
+    echo(k)
+   return buffr
 
- heads = HeadArray(down_to_closest_odd(terminal.height - 1), infile, renderer)
- heads.advance_all_heads_by_distance(terminal.width)
+ def down_to_closest_odd(self, num):
+  offset = (num - 1) % 2
+  return num - offset
 
- with terminal.fullscreen(), terminal.hidden_cursor(), terminal.cbreak():
-  heads.set_target_middle()
-  ky = ''
+ def main(self, infile, renderer=None):
 
-  while True:
+  heads = HeadArray(self.down_to_closest_odd(terminal.height - 1), infile, renderer)
+  heads.advance_all_heads_by_distance(terminal.width)
 
-   if ky == 'q':
-    break
+  with terminal.fullscreen(), terminal.hidden_cursor(), terminal.cbreak():
+   heads.set_target_middle()
+   ky = ''
 
-   elif ky == 'l':
-    heads.get_target().mv_right()
-   elif ky == 'h':
-    heads.get_target().mv_left()
+   while True:
 
-   elif ky == 'k':
-    heads.set_target_previous()
-   elif ky == 'j':
-    heads.set_target_next()
-   elif ky == ';':
-    heads.set_target_middle()
-   elif ky == 'd':
-    heads.set_target_last()
+    if ky == 'q':
+     break
 
-   # I like this: going '< on the first like takes you to the last line. It loops.
-   # move the target line to the home position, advancing all the heads in the process
-   elif ky == '<':
-    heads.advance_all_heads_by_distance(terminal.width)
+    elif ky == 'l':
+     heads.get_target().mv_right()
+    elif ky == 'h':
+     heads.get_target().mv_left()
 
-   elif ky == ':':
-    command = ex_mode()
-    ex_mode(prompt=eval(command))
-   elif ky == '/':
-    pattern = ex_mode(prompt='/')
-    heads.advance_all_heads_by_pattern(pattern)
+    elif ky == 'k':
+     heads.set_target_previous()
+    elif ky == 'j':
+     heads.set_target_next()
+    elif ky == ';':
+     heads.set_target_middle()
+    elif ky == 'd':
+     heads.set_target_last()
 
-   elif ky == '>':
-    heads.advance_all_heads_by_pattern(pattern)
+    # I like this: going '< on the first like takes you to the last line. It loops.
+    # move the target line to the home position, advancing all the heads in the process
+    elif ky == '<':
+     heads.advance_all_heads_by_distance(terminal.width)
 
-   #Tag optimization: acumulate all changes to terminal to take advantage of the print buffer
-   cumulative = ""
-   for i, fat in enumerate(heads.render_all(terminal.width)):
-    cumulative += terminal.move_xy(0,i) + fat
-   print(cumulative, end='')
-   echo('')
+    elif ky == ':':
+     command = self.ex_mode()
+     self.ex_mode(prompt=eval(command))
+    elif ky == '/':
+     pattern = self.ex_mode(prompt='/')
+     heads.advance_all_heads_by_pattern(pattern)
 
-   #Tag optimization: smaller time resolution for smaller sleep
-   with timer_resolution(1):
-    ky = terminal.inkey()
+    elif ky == '>':
+     heads.advance_all_heads_by_pattern(pattern)
+
+    #Tag optimization: acumulate all changes to terminal to take advantage of the print buffer
+    cumulative = ""
+    for i, fat in enumerate(heads.render_all(terminal.width)):
+     cumulative += terminal.move_xy(0,i) + fat
+    print(cumulative, end='')
+    echo('')
+
+    #Tag optimization: smaller time resolution for smaller sleep
+    with timer_resolution(1):
+     ky = terminal.inkey()
+
+main = functools.partial(VirtualTerminal().main, renderer=simplemap1)
+#main = VirtualTerminal().main

@@ -10,6 +10,12 @@
 #style
 000) each level adds its own stylings: the HeadArr adds the navigation styles, the LoopRibbon adds the text file specific style. How can I unify these style inputs so they can be given all dynamically in a single level, and each goes to the appropriate level? like: [HeadArr style functions, Head style functions, LoopRibbon style functions] is just a list given to the interfacing function.
 
+#movement
+000) make the current position the home position
+001) advance all heads by given distance. Like, I move the cursor in the target head by 3 spaces, then all cursors on all targets move by 3 spaces
+002) move the text in the current Head so the text selected by its cursor starts at the leftmost part of the window. Kind of like moving the current text to the window home... so, move the current text to the line home.
+003) in general, I'm taking a position and redrawing it to a different place. What changes is what the position is, where I am drawing it to, and who gets redrawn on the way. There are: HeadArr home, line home. There are current line, all lines. there are current position, searched pattern position. Would I need a more universal language to say What moves Where and Who is affected?
+
 6) jump to pattern match
 7) jump back and forth on pattern matches
 a) multiple pattern search
