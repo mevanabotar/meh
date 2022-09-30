@@ -208,13 +208,11 @@ class HeadArray():
    retn.append(self.select_background(i, line))
   return retn
 
-def renderizador(lista):
- retn = []
- for i in lista:
-  retn.append(rendr(ekatn(i)))
- return retn 
-
 class VirtualTerminal():
+
+ def print_at_bottom(self, toprint):
+  with terminal.location(0, terminal.height - 1):
+   echo(toprint)
 
  def ex_mode(self, buffr='', prompt=':'):
   #capture instructions at the bottom
@@ -234,6 +232,64 @@ class VirtualTerminal():
     echo(k)
    return buffr
 
+ def show_to_terminal(self, heads):
+
+  #Tag optimization: acumulate all changes to terminal to take advantage of the print buffer
+  cumulative = ""
+  for i, fat in enumerate(heads.render_all(terminal.width)):
+   cumulative += terminal.move_xy(0,i) + fat
+  print(cumulative, end='')
+  echo('')
+
+ def process_command(self, command, heads):
+
+  if command == 'q':
+   return False
+
+  elif command == 'l':
+   heads.get_target().mv_right()
+  elif command == 'h':
+   heads.get_target().mv_left()
+
+  elif command == 'k':
+   heads.set_target_previous()
+  elif command == 'j':
+   heads.set_target_next()
+  elif command == ';':
+   heads.set_target_middle()
+  elif command == 'd':
+   heads.set_target_last()
+
+  # I like this: going '< on the first like takes you to the last line. It loops.
+  # move the target line to the home position, advancing all the heads in the process
+  elif command == '<':
+   heads.advance_all_heads_by_distance(terminal.width)
+
+  elif command == ':':
+   command = self.ex_mode()
+   self.print_at_bottom(eval(command))
+  elif command == '/':
+   pattern = self.ex_mode(prompt='/')
+   heads.advance_all_heads_by_pattern(pattern)
+
+  elif command == '>':
+   heads.advance_all_heads_by_pattern(pattern)
+
+  return True
+
+ def interactive_loop(self, heads):
+
+  def next_command():
+   #Tag optimization: smaller time resolution for smaller sleep
+   with timer_resolution(1):
+    return terminal.inkey()
+
+  with terminal.fullscreen(), terminal.hidden_cursor(), terminal.cbreak():
+   cmd = ''
+   while self.process_command(cmd, heads):
+    self.show_to_terminal(heads)
+    cmd = next_command()
+
  def down_to_closest_odd(self, num):
   offset = (num - 1) % 2
   return num - offset
@@ -242,55 +298,9 @@ class VirtualTerminal():
 
   heads = HeadArray(self.down_to_closest_odd(terminal.height - 1), infile, renderer)
   heads.advance_all_heads_by_distance(terminal.width)
+  heads.set_target_middle()
 
-  with terminal.fullscreen(), terminal.hidden_cursor(), terminal.cbreak():
-   heads.set_target_middle()
-   ky = ''
-
-   while True:
-
-    if ky == 'q':
-     break
-
-    elif ky == 'l':
-     heads.get_target().mv_right()
-    elif ky == 'h':
-     heads.get_target().mv_left()
-
-    elif ky == 'k':
-     heads.set_target_previous()
-    elif ky == 'j':
-     heads.set_target_next()
-    elif ky == ';':
-     heads.set_target_middle()
-    elif ky == 'd':
-     heads.set_target_last()
-
-    # I like this: going '< on the first like takes you to the last line. It loops.
-    # move the target line to the home position, advancing all the heads in the process
-    elif ky == '<':
-     heads.advance_all_heads_by_distance(terminal.width)
-
-    elif ky == ':':
-     command = self.ex_mode()
-     self.ex_mode(prompt=eval(command))
-    elif ky == '/':
-     pattern = self.ex_mode(prompt='/')
-     heads.advance_all_heads_by_pattern(pattern)
-
-    elif ky == '>':
-     heads.advance_all_heads_by_pattern(pattern)
-
-    #Tag optimization: acumulate all changes to terminal to take advantage of the print buffer
-    cumulative = ""
-    for i, fat in enumerate(heads.render_all(terminal.width)):
-     cumulative += terminal.move_xy(0,i) + fat
-    print(cumulative, end='')
-    echo('')
-
-    #Tag optimization: smaller time resolution for smaller sleep
-    with timer_resolution(1):
-     ky = terminal.inkey()
+  self.interactive_loop(heads)
 
 main = functools.partial(VirtualTerminal().main, renderer=simplemap1)
 #main = VirtualTerminal().main

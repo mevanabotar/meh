@@ -196,6 +196,12 @@ def rendr(number):
 def prerendr(number):
  return term.color_rgb(*number[0]) + number[1]
 
+def renderizador(lista):
+ retn = []
+ for i in lista:
+  retn.append(rendr(ekatn(i)))
+ return retn 
+
 def testekatn():
  for i in range(256):
   echo(rendr(ekatn(i)))
