@@ -26,6 +26,9 @@ def keywity(context_man):
  with context_man():
   return terminal.inkey()
 
+def rotate_to_half(index, whole):
+ return index - whole //2
+
 #Pg cursor
 
 class LoopRibbon():
@@ -111,16 +114,19 @@ class Head():
 
 # multilines
 
+
+
 class HeadArray():
 
- def __init__(self, headnum, tape='', renderer=None):
+ def __init__(self, headnum, datass, relren):
 
-  self.datass = LoopRibbon(tape, renderer)
+  self.datass = datass
+  self.relren = relren
   self.headarr = [Head(0, self.datass.duplicate()) for i in range(headnum)]
   self.target_head = 0
 
  def rotate_index_to_half_of_list(self, index):
-  return index - len(self.headarr) //2
+  return rotate_to_half(index, len(self.headarr))
 
  def distance_advancement_list(self, distance):
   start = self.get_target().x
@@ -173,42 +179,19 @@ class HeadArray():
  def set_target_last(self):
   self.set_target(-1)
 
- def background(self, graynum, fat):
-  backd = terminal.on_color_rgb(graynum, graynum, graynum)
-  return backd + fat + terminal.normal
-
- def select_background(self, index, fat):
-  rele = abs(self.rotate_index_to_half_of_list(index))
-  retn = ''
-  mo = rele % 4
-  ma = rele % 8
-  me = rele % 32
-
-  if rele == 0:
-   retn = self.background(110, fat)
-
-  elif me == 0 or me == 31:
-   retn = self.background(100, fat)
-
-  elif ma == 0 or ma == 7:
-   retn = self.background(80, fat)
-
-  elif mo == 1 or mo == 2:
-   retn = self.background(0, fat)
-  else:
-   retn = self.background(30, fat)
-  return retn
-
  def render_all(self, size):
   def is_target(i):
    return i == self.target_head
   retn = []
   for i in range(self.get_headnum()):
    line = self.headarr[i].render(size, is_target(i))
-   retn.append(self.select_background(i, line))
+   retn.append(self.relren(i, len(self.headarr), line))
   return retn
 
 class VirtualTerminal():
+ 
+ def __init__(self):
+  self.pattern = ''
 
  def print_at_bottom(self, toprint):
   with terminal.location(0, terminal.height - 1):
@@ -269,11 +252,11 @@ class VirtualTerminal():
    command = self.ex_mode()
    self.print_at_bottom(eval(command))
   elif command == '/':
-   pattern = self.ex_mode(prompt='/')
-   heads.advance_all_heads_by_pattern(pattern)
+   self.pattern = self.ex_mode(prompt='/')
+   heads.advance_all_heads_by_pattern(self.pattern)
 
   elif command == '>':
-   heads.advance_all_heads_by_pattern(pattern)
+   heads.advance_all_heads_by_pattern(self.pattern)
 
   return True
 
@@ -295,12 +278,37 @@ class VirtualTerminal():
   return num - offset
 
  def main(self, infile, renderer=None):
-
-  heads = HeadArray(self.down_to_closest_odd(terminal.height - 1), infile, renderer)
+  datass = LoopRibbon(infile, renderer)
+  heads = HeadArray(self.down_to_closest_odd(terminal.height - 1), datass, select_background)
   heads.advance_all_heads_by_distance(terminal.width)
   heads.set_target_middle()
 
   self.interactive_loop(heads)
 
+def background(graynum, fat):
+ backd = terminal.on_color_rgb(graynum, graynum, graynum)
+ return backd + fat + terminal.normal
+
+def select_background(index, number, fat):
+ rele = abs(rotate_to_half(index, number))
+ retn = ''
+ mo = rele % 4
+ ma = rele % 8
+ me = rele % 32
+
+ if rele == 0:
+  retn = background(110, fat)
+
+ elif me == 0 or me == 31:
+  retn = background(100, fat)
+
+ elif ma == 0 or ma == 7:
+  retn = background(80, fat)
+
+ elif mo == 1 or mo == 2:
+  retn = background(0, fat)
+ else:
+  retn = background(30, fat)
+ return retn
+
 main = functools.partial(VirtualTerminal().main, renderer=simplemap1)
-#main = VirtualTerminal().main
