@@ -9,6 +9,8 @@ import blessed
 from mytests.blessedtst import ekatn, rendr, prerendr, simplemap1, incompletemap1
 from mytests.kairos import timer_resolution
 from memoization import Memo
+from iris import pupil
+from iris import renderers
 
 
 #Pg begin
@@ -28,6 +30,10 @@ def keywity(context_man):
 
 def rotate_to_half(index, whole):
  return index - whole //2
+
+def down_to_closest_odd(num):
+ offset = (num - 1) % 2
+ return num - offset
 
 #Pg cursor
 
@@ -113,8 +119,6 @@ class Head():
   return "".join(texto)
 
 # multilines
-
-
 
 class HeadArray():
 
@@ -273,13 +277,9 @@ class VirtualTerminal():
     self.show_to_terminal(heads)
     cmd = next_command()
 
- def down_to_closest_odd(self, num):
-  offset = (num - 1) % 2
-  return num - offset
-
  def main(self, infile, renderer=None):
-  datass = LoopRibbon(infile, renderer)
-  heads = HeadArray(self.down_to_closest_odd(terminal.height - 1), datass, select_background)
+
+  heads = HeadArray(down_to_closest_odd(terminal.height - 1), LoopRibbon(infile, renderer), select_background)
   heads.advance_all_heads_by_distance(terminal.width)
   heads.set_target_middle()
 
