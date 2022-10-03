@@ -247,7 +247,11 @@ class StyleObj(StackRenderer):
     return retn
 
  def slurp(self, styleobj):
+  #can append a styleobj or a regular string
   self.data.append(styleobj)
+
+ def __gettitem__(self, subscript):
+  return self.data[subscript]
 
  def __repr__(self):
   return str(self.styles) + str(self.data)

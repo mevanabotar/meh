@@ -56,8 +56,10 @@ class LoopRibbon():
  def render(self, start, delta):
 
   if self.renderer is not None:
+   """
    #Tag optimization: reduce the number of calls to render by memoizing already rendered values
    prerendered = self.rendered.get_slice(start, delta) 
+   #I don't know how to integrate memoization with styleobj, so I'll leave it out for now.
    if prerendered is not None:
     return prerendered
 
@@ -65,6 +67,8 @@ class LoopRibbon():
    self.rendered.add_slice(start, delta, hererendered)
    self.rendered.consolidate()
    return hererendered 
+   """
+   return self.renderer(self.slice(start, delta))
 
   return self.slice(start, delta)
 
@@ -107,16 +111,18 @@ class Head():
   return s, e
 
  def insert_cursor_at(self, lista, pos):
-  lista[pos] = terminal.reverse(lista[pos])
+  lista[pos] = pupil.StyleObj(['','','','','1'], lista[pos])
   return lista
 
  def render(self, width, target_flag=False):
-  datt = self.track.render(self.x, width)
-  if target_flag:
-   texto = self.insert_cursor_at(datt, 0)
-  else:
-   texto = datt
-  return "".join(texto)
+  texto = self.track.render(self.x, width)
+  r, g, b = [randint(0,200) for i in [1, 2, 3]]
+  print(f"\033[48;2;{r};{g};{b}m", texto , "\033[0m")
+  #if target_flag:
+   #texto = self.insert_cursor_at(datt, 0)
+  #else:
+   #texto = datt
+  return pupil.StyleObj(['','','','',''], texto)
 
 # multilines
 
@@ -223,8 +229,16 @@ class VirtualTerminal():
 
   #Tag optimization: acumulate all changes to terminal to take advantage of the print buffer
   cumulative = ""
+  rendrs = [renderers.render_fore_color, renderers.render_back_color, renderers.render_bold, renderers.render_italic, renderers.render_reverse]
   for i, fat in enumerate(heads.render_all(terminal.width)):
-   cumulative += terminal.move_xy(0,i) + fat
+   print("\n\n\n", fat)
+   terminal.inkey()
+   try:
+    cumulative += terminal.move_xy(0,i) + fat.compa(rendrs)
+   except TypeError:
+    print("\n\n\n\n\n\033[38;2;255;0;0m", fat)
+    while True:
+     terminal.inkey()
   print(cumulative, end='')
   echo('')
 
@@ -286,8 +300,8 @@ class VirtualTerminal():
   self.interactive_loop(heads)
 
 def background(graynum, fat):
- backd = terminal.on_color_rgb(graynum, graynum, graynum)
- return backd + fat + terminal.normal
+ backd = "{0}{0}{0}".format(graynum)
+ return pupil.StyleObj(["bbbbbb", backd, "0", "0", "0"], [fat])
 
 def select_background(index, number, fat):
  rele = abs(rotate_to_half(index, number))
@@ -297,18 +311,34 @@ def select_background(index, number, fat):
  me = rele % 32
 
  if rele == 0:
-  retn = background(110, fat)
+  retn = background('6e', fat)
 
  elif me == 0 or me == 31:
-  retn = background(100, fat)
+  retn = background('64', fat)
 
  elif ma == 0 or ma == 7:
-  retn = background(80, fat)
+  retn = background('50', fat)
 
  elif mo == 1 or mo == 2:
-  retn = background(0, fat)
+  retn = background('00', fat)
  else:
-  retn = background(30, fat)
+  retn = background('1e', fat)
  return retn
 
-main = functools.partial(VirtualTerminal().main, renderer=simplemap1)
+def condense(chars):
+ acum = ""
+ retn = pupil.StyleObj([], [])
+ for i in chars:
+  if i == '\n':
+   retn.slurp(acum)
+   retn.slurp(pupil.StyleObj(['00ffff'], [i]))
+   acum = ""
+  elif i == '\t':
+   retn.slurp(acum)
+   retn.slurp(pupil.StyleObj(['00ffff'], [i]))
+   acum = ""
+  else:
+   acum += i
+ return retn
+
+main = functools.partial(VirtualTerminal().main, renderer=condense)
