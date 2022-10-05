@@ -249,10 +249,8 @@ class StyleObj(StackRenderer):
  def slurp(self, styleobj):
   self.data.append(styleobj)
 
+ def __len__(self):
+  return len(self.data)
+
  def __repr__(self):
   return str(self.styles) + str(self.data)
-
-atst = StyleObj('aaaaaa 444400 0'.split(), ["bruno franco salamin ",
-       StyleObj(['ff0000', '', '1'], ["brantley"]),
-       StyleObj(['', '000055', '1'], ["perez", StyleObj(['bb00bb'], ["saavedra"])])])
-atst.slurp(StyleObj(['', '00dd00'], ['calvo']))
