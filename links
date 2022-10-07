@@ -14,6 +14,17 @@ https://github.com/pyos/dg
 https://github.com/gilch/hissp#repl
 https://github.com/gilch/hebigo
 https://github.com/i2y/mochi
+https://stackoverflow.com/questions/3917574/how-is-pythons-list-implemented
+https://pythonspeed.com/articles/python-integers-memory/
+https://pythonspeed.com/articles/numpy-memory-footprint/
+https://stackoverflow.com/questions/42020122/is-linked-list-always-slower-than-python-list
+https://stackoverflow.com/questions/449560/how-do-i-determine-the-size-of-an-object-in-python
+https://leanpub.com/insidethepythonvirtualmachine/read
+https://stackoverflow.com/questions/449560/how-do-i-determine-the-size-of-an-object-in-python
+
+#art
+https://es.wikipedia.org/wiki/Escorzo
+https://artincontext.org/foreshortening/
 
 #java
 https://en.wikipedia.org/wiki/Java_virtual_machine
@@ -22,7 +33,6 @@ https://en.wikipedia.org/wiki/Java_virtual_machine
 https://en.wikipedia.org/wiki/Comparison_of_application_virtualization_software
 https://en.wikipedia.org/wiki/List_of_ECMAScript_engines
 
-
 #turtle
 https://realpython.com/beginners-guide-python-turtle/#final-project-the-python-turtle-race
 https://docs.python.org/3/library/unittest.html
@@ -30,6 +40,7 @@ https://docs.python.org/3/library/unittest.html
 #languages
 https://archive.is/GLnbp
 https://steve-yegge.medium.com/
+https://www.youtube.com/watch?v=75U3W8Y2zzw
 
 #networking
 https://en.wikipedia.org/wiki/Van_Jacobson
@@ -38,6 +49,36 @@ https://en.wikipedia.org/wiki/Content_centric_networking
 https://named-data.net/
 https://unix.stackexchange.com/questions/88281/method-to-check-connectivity-to-other-server
 https://www.networkworld.com/article/3615591/linux-commands-for-testing-connectivity-and-transfer-rates.html
+https://en.wikipedia.org/wiki/Iproute2
+https://stackoverflow.com/questions/4910422/whats-the-easiest-way-to-test-a-gateway
+https://serverfault.com/questions/742126/perform-traceroute-with-specific-outgoing-ip
+https://serverfault.com/questions/741246/ip-range-connected-to-my-server-suddenly-times-out
+https://www.pcwdld.com/traceroute#:~:text=For%20example%2C%20if%20the%20source,and%20the%20time%20it%20takes
+https://community.ui.com/questions/Traceroute-out-interface/a1f2d73c-ecec-41a8-b9f3-dbb247402088
+https://wiki.gentoo.org/wiki/OpenRC
+https://www.cyberciti.biz/faq/check-running-services-in-rhel-redhat-fedora-centoslinux/
+https://docs.rackspace.com/support/how-to/checking-listening-ports-with-netstat/
+https://www.maketecheasier.com/fix-no-route-to-host-error-linux/
+https://www.rootusers.com/how-to-display-routing-table-in-linux/
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/s1-networkscripts-static-routes
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-configuring_ip_networking_with_ifcg_files
+https://web.mit.edu/rhel-doc/4/RH-DOCS/rhel-rg-es-4/s1-networkscripts-interfaces.html
+https://www.cyberciti.biz/faq/howto-setting-rhel7-centos-7-static-ip-configuration/
+https://www.cyberciti.biz/faq/linux-restart-network-interface/
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-configuring_static_routes_in_ifcfg_files
+https://www.dummies.com/article/technology/information-technology/networking/general-networking/network-administration-linux-ifcfg-files-183711/
+https://docs.oracle.com/cd/E19253-01/816-4554/gecqy/index.html
+https://www.cyberciti.biz/faq/ip-route-add-network-command-for-linux-explained/
+https://devconnected.com/how-to-add-route-on-linux/
+https://community.cisco.com/t5/routing/default-gateway-exit-interface/td-p/1150543
+https://superuser.com/questions/109021/what-does-gateway-in-routing-table-refer-to
+https://unix.stackexchange.com/questions/56453/how-can-i-monitor-all-outgoing-requests-connections-from-my-machine
+
+
+#mesh network
+https://en.wikipedia.org/wiki/Mesh_networking
+https://www.researchgate.net/publication/220626953_Making_a_mesh_routergateway_from_a_smartphone_Is_that_a_practical_solution
+https://stackoverflow.com/questions/57384918/is-it-possible-to-create-a-bluetooth-mesh-network-with-ios-and-android-devices
 
 #automata
 https://en.wikipedia.org/wiki/Constraint_programming#:~:text=Constraint%20programming%20(CP)%20is%20a,a%20set%20of%20decision%20variables.
@@ -58,4 +99,47 @@ https://github.com/ztellman?tab=repositories
 https://aleph.io/
 http://www.colm.net/open-source/ragel/
 https://ideolalia.com/libraries.html
+https://github.com/hypirion?language=&page=2&q=&sort=&tab=repositories&type=source
+https://hypirion.com/musings/understanding-persistent-vector-pt-1
+https://github.com/hypirion/genetica
+https://github.com/hyPiRion/c-rrb
+https://github.com/janm31415/cpp-rrb
+
+#git
+https://stackoverflow.com/questions/2816715/branch-from-a-previous-commit-using-git
+https://dl.acm.org/doi/10.1145/3299869.3319870
+
+#text editor
+https://github.com/arximboldi/ewig
+https://www.youtube.com/watch?v=sPhpelUfu8Q
+https://public.sinusoid.es/misc/immer/immer-icfp17-preprint-00.pdf
+https://github.com/arximboldi/immer
+https://news.ycombinator.com/item?id=11244103
+https://ecc-comp.blogspot.com/2015/05/a-brief-glance-at-how-5-text-editors.html
+https://iq.opengenus.org/data-structures-used-in-text-editor/
+https://stackoverflow.com/questions/12358083/purely-functional-data-structures-for-text-editors
+https://vi.stackexchange.com/questions/184/how-can-i-clear-word-highlighting-in-the-current-document-e-g-such-as-after-se
+
+#linux
+https://stackoverflow.com/questions/1406808/wait-for-file-to-be-freed-by-process
+https://askubuntu.com/questions/360252/what-do-the-stat-column-values-in-ps-mean
+https://www.win.tue.nl/~aeb/linux/lk/lk-10.html
+https://en.wikipedia.org/wiki/Process_group
+https://unix.stackexchange.com/questions/18166/what-are-session-leaders-in-ps
+
+#programming
+https://github.com/ggreer/the_silver_searcher
+https://geoff.greer.fm/2014/10/13/help-me-get-to-ag-10/
+https://github.com/theospears?tab=repositories
+
+#dating
+https://www.google.com/travel/things-to-do/see-all?g2lb=2502548,2503771,2503781,4258168,4270442,4284970,4291517,4306835,4597339,4718358,4723331,4731327,4757164,4814050,4816977,4826689,4852066,4856937,4859602,4861688,4865466,26483161&hl=es-419&gl=pa&ssta=1&dest_mid=/m/05qx1&dest_state_type=sattd&dest_src=tsvr&sa=X&ved=2ahUKEwj7gN7Xtcz6AhVORDABHbZgBrgQzTooAXoECGMQAg
+https://es.wikipedia.org/wiki/Cerro_Anc%C3%B3n
+https://caminandopanama.org/senderos-canal/41-cerro-ancon
+https://www.google.com/search?q=panama+mi+pueblito&rlz=1C1GCEA_enPA1022PA1022&oq=panama+mi+pueblito&aqs=chrome..69i57j0i22i30l5.4352j0j7&sourceid=chrome&ie=UTF-8
+https://es.wikiloc.com/rutas-correr-descalzo/camino-a-reforestacion-king-college-114129924
+https://es.wikiloc.com/
+https://es.wikipedia.org/wiki/Casa_de_Adoraci%C3%B3n_Baha%C3%AD
+https://www.google.com/search?q=el+sotano+panama&rlz=1C1GCEA_enPA1022PA1022&oq=el+sotano+panama&aqs=chrome..69i57j46i175i199i512.2543j0j9&sourceid=chrome&ie=UTF-8
+
 

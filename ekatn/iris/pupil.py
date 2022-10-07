@@ -218,11 +218,12 @@ class StyleObj(StackRenderer):
  def is_styleobj(self, obj):
   return type(obj) == type(self)
 
- def compile_step(self, styleStacks, styles, members):
+ def compile_step(self, styleStacks, styles):
   undoes = self.save_styles(styleStacks, wash_brains(styles))
-  return undoes, members
+  return undoes
 
- def compa(self, render_functions):
+ def compa(self, render_functions=[]):
+  # if called without arguments, return the unstyled string
   pending = []
   styleStacks = [[] for i in self.styles]
   undoStylesStack = []
@@ -237,7 +238,8 @@ class StyleObj(StackRenderer):
      elts = elts[1:]
     else:
      pending.append(elts[1:])
-     undo, elts = self.compile_step(styleStacks, elts[0].styles, elts[0].data)
+     undo = self.compile_step(styleStacks, elts[0].styles)
+     elts = elts[0].data
      undoStylesStack.append(undo)
 
    elif pending:
@@ -246,11 +248,27 @@ class StyleObj(StackRenderer):
    else:
     return retn
 
+ def stylefields(self):
+  def recur(elt):
+   retn = len(elt.styles)
+   for et in elt.data:
+    if self.is_styleobj(et):
+     retn = max(retn, recur(et))
+   return retn
+  return recur(self)
+
  def slurp(self, styleobj):
   self.data.append(styleobj)
 
+ def bite(self, string):
+  if type(self.data[-1]) is str:
+   self.data[-1] += string
+  else:
+   self.slurp(string)
+
  def __len__(self):
-  return len(self.data)
+  retn = sum([len(elt) for elt in self.data])
+  return retn
 
  def __repr__(self):
   return str(self.styles) + str(self.data)
