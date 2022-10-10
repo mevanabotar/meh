@@ -26,6 +26,7 @@ def mkup(char):
  return retn
 
 def todito(string):
+ #make a styleobj with the simple cyan style from the given string
  data = []
  cumm = ""
  for i in string:
@@ -37,7 +38,10 @@ def todito(string):
     data.append(cumm)
     cumm = ""
    data.append(curr)
- retn = pupil.StyleObj(['cccccc'], data)
+ else:
+  if cumm:
+   data.append(cumm)
+ retn = pupil.StyleObj(['cccccc'], data, [renderers.render_fore_color])
  return retn
 
 

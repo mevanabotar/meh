@@ -113,6 +113,13 @@ class StackRenderer():
    raise StackUnderflow
   return retn 
 
+ def down(self, stack):
+  try:
+   retn = stack[-2]
+  except IndexError:
+   raise StackUnderflow
+  return retn 
+
  def save_styles(self, stackarray, brains):
   """Initialize the stackarray with the style elements
 
@@ -124,16 +131,34 @@ class StackRenderer():
   outgoing: (True,False,True)
   side effect: [['ffffff', None, 'ff0000', None], ['000000', None], ['1', None, '0', None], ['1', None]]
 
+  incoming: ('ff0000', None, '1')
+  outgoing: (False,False,True)
+  side effect: [['ffffff', None, 'ff0000', None], ['000000', None], ['1', None, '0', None, '1', None], ['1', None]]
+
   incoming: overwrite_styles
   outgoing: updated style use stack array
 
   The None in each stack array is a use flag: if the top of the stack is None, the underlying style has not been applied in this sequence. Then it is rendered. If there is a stack value on top of the stack, that value is in effect right now.
   """
+  undoes = []
+
   for stystack, stye in zip(stackarray, brains):
 
    #if the style is not overwritten, do nothing
    if stye is None:
+    undoes.append(False)
     continue
+
+   #if the new style is the same as the current style, do nothing
+   try:
+    if self.top(stystack) == stye:
+     undoes.append(False)
+     continue
+    elif self.down(stystack) == stye:
+     undoes.append(False)
+     continue
+   except StackUnderflow:
+    pass #if the stack is empty, there is something that needs application
 
    #if the style has been applied, unapply it
    try:
@@ -147,8 +172,9 @@ class StackRenderer():
    if stye is not None:
     stystack.append(stye)
     stystack.append(None)
+    undoes.append(True)
 
-  return [True if i is not None else False for i in brains] #True for stacks that were modified
+  return undoes #[True if i is not None else False for i in brains] #True for stacks that were modified
 
  def apply_styles(self, target, stylestacks, renderfuncs, tarmod=lambda x: x):
   """Render the target string applying the styles saved in stylestacks according to renderfuncs.
@@ -211,9 +237,10 @@ class StackRenderer():
 
 class StyleObj(StackRenderer):
 
- def __init__(self, styles, datalist):
+ def __init__(self, styles, datalist, rendfuncs=[]):
   self.styles = styles
   self.data = datalist
+  self.rendfuncs = rendfuncs
 
  def is_styleobj(self, obj):
   return type(obj) == type(self)
@@ -222,19 +249,21 @@ class StyleObj(StackRenderer):
   undoes = self.save_styles(styleStacks, wash_brains(styles))
   return undoes
 
- def compa(self, render_functions=[]):
+ def compa(self):
   # if called without arguments, return the unstyled string
   pending = []
   styleStacks = [[] for i in self.styles]
   undoStylesStack = []
-  undo, elts = self.compile_step(styleStacks, self.styles, self.data)
+  undo = self.compile_step(styleStacks, self.styles)
+  elts = self.data
   retn = ""
 
   while True:
 
+   #my own code is becoming a mystery to me
    if elts:
     if not self.is_styleobj(elts[0]):
-     retn += self.apply_styles(elts[0], styleStacks, render_functions)
+     retn += self.apply_styles(elts[0], styleStacks, self.rendfuncs)
      elts = elts[1:]
     else:
      pending.append(elts[1:])
