@@ -1,5 +1,6 @@
 
 import re
+import iris.renderers as renderers
 
 #Pg escape hack
 
@@ -150,15 +151,15 @@ class StackRenderer():
     continue
 
    #if the new style is the same as the current style, do nothing
-   try:
-    if self.top(stystack) == stye:
-     undoes.append(False)
-     continue
-    elif self.down(stystack) == stye:
-     undoes.append(False)
-     continue
-   except StackUnderflow:
-    pass #if the stack is empty, there is something that needs application
+   #try:
+    #if self.top(stystack) == stye:
+     #undoes.append(False)
+     #continue
+    #elif self.down(stystack) == stye:
+     #undoes.append(False)
+     #continue
+   #except StackUnderflow:
+    #pass #if the stack is empty, there is something that needs application
 
    #if the style has been applied, unapply it
    try:
@@ -194,7 +195,7 @@ class StackRenderer():
    ste.append(sye)
   return stye + tarmod(target)
 
- def clean_styles_stack(self, stylestacks, undoes):
+ def clean_styles_stack(self, stylestacks, undoes, nxt=''):
   for sk, ud in zip(stylestacks, undoes):
    if ud:
     sk.pop()
@@ -245,6 +246,19 @@ class StyleObj(StackRenderer):
  def is_styleobj(self, obj):
   return type(obj) == type(self)
 
+ def clean_styles_stack(self, stylestacks, undoes, nxt=''):
+  if self.is_styleobj(nxt):
+   stys = nxt.styles
+  else:
+   stys = [False] * len(undoes)
+
+  for sk, ud, sts in zip(stylestacks, undoes, stys):
+   print(self.top(sk), ud, sts)
+   #if self.top(sk) == sts:
+    #ud = False
+   if ud:
+    sk.pop()
+
  def compile_step(self, styleStacks, styles):
   undoes = self.save_styles(styleStacks, wash_brains(styles))
   return undoes
@@ -273,9 +287,16 @@ class StyleObj(StackRenderer):
 
    elif pending:
     elts = pending.pop()
-    self.clean_styles_stack(styleStacks, undoStylesStack.pop())
+    print('\033[38;2;200;200;0m', elts, '\n', '\033[38;2;0;200;200m', pending, '\033[0m\n')
+    nxt = ''
+    if elts:
+     nxt = elts[0]
+    self.clean_styles_stack(styleStacks, undoStylesStack.pop(), nxt)
    else:
     return retn
+
+ def indexed(self, index):
+  pass
 
  def stylefields(self):
   def recur(elt):
@@ -301,3 +322,15 @@ class StyleObj(StackRenderer):
 
  def __repr__(self):
   return str(self.styles) + str(self.data)
+
+b = StyleObj(['bbbbbb', '550055', '1'], ["bruno franco", StyleObj(['','005500'], [" salamin"])], [renderers.render_fore_color, renderers.render_back_color, renderers.render_bold])
+b.slurp(StyleObj(['bbbbbb'], ["brantley"]))
+b.slurp(StyleObj(['bbbbbb'], [" perez"]))
+b.slurp(StyleObj(['00bbbb'], [" saavedra"]))
+b.bite(" calvo")
+b.slurp(StyleObj(['aa00aa'], ['uno']))
+b.slurp(StyleObj(['aa00aa'], ['dos']))
+b.bite("tres")
+b.slurp(StyleObj(['aa00aa'], ['cuatro']))
+b.bite("cinco")
+b.slurp(StyleObj(['aa00aa'], ['seis']))

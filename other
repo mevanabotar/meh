@@ -1,0 +1,12 @@
+
+b = StyleObj(['bbbbbb', '550055', '1'], ["bruno franco", StyleObj(['','005500'], [" salamin"])], [renderers.render_fore_color, renderers.render_back_color, renderers.render_bold])
+b.slurp(StyleObj(['bbbbbb'], ["brantley"]))
+b.slurp(StyleObj(['bbbbbb'], [" perez"]))
+b.slurp(StyleObj(['00bbbb'], [" saavedra"]))
+b.bite(" calvo")
+b.slurp(StyleObj(['aa00aa'], ['uno']))
+b.slurp(StyleObj(['aa00aa'], ['dos']))
+b.bite("tres")
+b.slurp(StyleObj(['aa00aa'], ['cuatro']))
+b.bite("cinco")
+b.slurp(StyleObj(['aa00aa'], ['seis']))
