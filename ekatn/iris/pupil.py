@@ -247,13 +247,13 @@ class StyleObj(StackRenderer):
   return type(obj) == type(self)
 
  def clean_styles_stack(self, stylestacks, undoes, nxt=''):
-  if self.is_styleobj(nxt):
-   stys = nxt.styles
-  else:
-   stys = [False] * len(undoes)
+  #if self.is_styleobj(nxt):
+   #stys = nxt.styles
+  #else:
+   #stys = [False] * len(stylestacks)
 
-  for sk, ud, sts in zip(stylestacks, undoes, stys):
-   print(self.top(sk), ud, sts)
+  for sk, ud in zip(stylestacks, undoes):#, stys):
+   #print(self.top(sk), ud, sts)
    #if self.top(sk) == sts:
     #ud = False
    if ud:
@@ -334,3 +334,6 @@ b.bite("tres")
 b.slurp(StyleObj(['aa00aa'], ['cuatro']))
 b.bite("cinco")
 b.slurp(StyleObj(['aa00aa'], ['seis']))
+
+def wh(string):
+ print(string + '\033[0m')
