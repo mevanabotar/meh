@@ -1,6 +1,14 @@
 
 https://www.youtube.com/results?search_query=laureano+marquez
 
+#android
+https://github.com/clojure-android
+https://picolisp-explored.com/mobile-app-development-in-picolisp-i-android-basics
+https://play.google.com/store/apps/details?id=de.software_lab.pilbox&hl=de&gl=US
+https://developer.android.com/oauth2callback?state=%7B%22csrf_token%22%3A+%22d957d458f9f677ad4d9845b76342f967ec3adc22a91b698e56cc3f239f989094%22%2C+%22return_url%22%3A+%22https%3A%2F%2Fdeveloper.android.com%2Fndk%2Fguides%22%7D&error_subtype=access_denied&error=interaction_required
+https://picolisp-explored.com/a-camera-android-app-written-in-picolisp-pt-1
+
+
 #python
 http://python-notes.curiousefficiency.org/en/latest/python3/text_file_processing.html
 https://blessed.readthedocs.io/en/latest/keyboard.html
@@ -21,6 +29,46 @@ https://stackoverflow.com/questions/42020122/is-linked-list-always-slower-than-p
 https://stackoverflow.com/questions/449560/how-do-i-determine-the-size-of-an-object-in-python
 https://leanpub.com/insidethepythonvirtualmachine/read
 https://stackoverflow.com/questions/449560/how-do-i-determine-the-size-of-an-object-in-python
+https://leanpub.com/insidethepythonvirtualmachine/read
+https://docs.python.org/3/library/contextlib.html
+https://book.pythontips.com/en/latest/context_managers.html
+
+
+#music programming
+https://wiki.python.org/moin/Audio/
+https://wiki.python.org/moin/PythonInMusic
+https://python.plainenglish.io/build-your-own-python-synthesizer-part-3-162796b7d351
+https://github.com/patrickkidd/pyrtmidi
+https://manualzz.com/doc/o/sljz4/python-projects---x-chapter-7-solutions
+https://www.winsite.com/Audio/MIDI/12/
+https://code.google.com/archive/p/ounk/
+https://pythonbasics.org/python-play-sound/
+https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
+https://pythonprogramming.net/adding-sounds-music-pygame/
+https://stackoverflow.com/questions/16913047/playing-midi-on-pygame
+https://www.pygame.org/docs/ref/midi.html
+https://pythonprogramming.altervista.org/a-midi-synth-in-pygame/
+http://csis.pace.edu/~ctappert/it691-projects/PACE_DataCapture/FimbelKeyLogger/basicKeyLogger/library/python/Lib/site-packages/pygame/midi.py
+https://stackoverflow.com/questions/62143171/how-do-i-get-inputs-from-a-midi-device-through-pygame
+https://stackoverflow.com/questions/64818410/pygame-read-midi-input
+https://unix.stackexchange.com/questions/705948/enable-a-software-midi-output-for-use-with-pygame
+https://github.com/myint/pygame/blob/master/lib/midi.py
+https://www.patreon.com/posts/midi-music-pygame-python-43826303
+https://stackoverflow.com/questions/33286619/python-pygame-midi-error-portmidi
+
+
+
+#security
+https://security.stackexchange.com/questions/265424/understanding-suspicious-http-get-request
+https://en.wikipedia.org/wiki/Internet_background_noise
+https://en.wikipedia.org/wiki/Network_telescope
+
+
+
+#picolisp
+https://picolisp-explored.com/functional-programming-in-picolisp
+https://gitlab.com/picolisp-blog
+
 
 #art
 https://es.wikipedia.org/wiki/Escorzo
@@ -32,6 +80,7 @@ https://en.wikipedia.org/wiki/Java_virtual_machine
 #virtual machines
 https://en.wikipedia.org/wiki/Comparison_of_application_virtualization_software
 https://en.wikipedia.org/wiki/List_of_ECMAScript_engines
+https://leanpub.com/insidethepythonvirtualmachine/read
 
 #turtle
 https://realpython.com/beginners-guide-python-turtle/#final-project-the-python-turtle-race
@@ -41,6 +90,8 @@ https://docs.python.org/3/library/unittest.html
 https://archive.is/GLnbp
 https://steve-yegge.medium.com/
 https://www.youtube.com/watch?v=75U3W8Y2zzw
+https://www.youtube.com/watch?v=2V1FtfBDsLU
+
 
 #networking
 https://en.wikipedia.org/wiki/Van_Jacobson
@@ -73,6 +124,17 @@ https://devconnected.com/how-to-add-route-on-linux/
 https://community.cisco.com/t5/routing/default-gateway-exit-interface/td-p/1150543
 https://superuser.com/questions/109021/what-does-gateway-in-routing-table-refer-to
 https://unix.stackexchange.com/questions/56453/how-can-i-monitor-all-outgoing-requests-connections-from-my-machine
+https://beej.us/guide/bgnet/
+https://beej.us/guide/bgipc/
+https://en.wikipedia.org/wiki/Iproute2
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-configuring_ip_networking_with_ifcg_files
+https://superuser.com/questions/443238/make-dhcp-assign-same-ip-and-hostname-for-different-interfaces-at-one-machine
+https://unix.stackexchange.com/questions/115870/configure-multiple-interfaces-with-different-hostnames-using-dhcp-and-dns
+https://superuser.com/questions/1101492/how-to-send-dhcp-server-a-different-hostname-than-the-machines-static-host-name
+https://www.dummies.com/article/technology/information-technology/networking/general-networking/network-administration-linux-ifcfg-files-183711/
+https://www.thegeekdiary.com/understanding-the-network-interface-configuration-file-etc-sysconfig-network-scripts-ifcfg-eth/
+
+
 
 
 #mesh network
@@ -126,6 +188,10 @@ https://askubuntu.com/questions/360252/what-do-the-stat-column-values-in-ps-mean
 https://www.win.tue.nl/~aeb/linux/lk/lk-10.html
 https://en.wikipedia.org/wiki/Process_group
 https://unix.stackexchange.com/questions/18166/what-are-session-leaders-in-ps
+https://en.wikipedia.org/wiki/Readahead
+https://github.com/xinetd-org/xinetd
+https://fedingo.com/how-to-monitor-outgoing-http-requests-in-linux/
+
 
 #programming
 https://github.com/ggreer/the_silver_searcher
@@ -142,4 +208,16 @@ https://es.wikiloc.com/
 https://es.wikipedia.org/wiki/Casa_de_Adoraci%C3%B3n_Baha%C3%AD
 https://www.google.com/search?q=el+sotano+panama&rlz=1C1GCEA_enPA1022PA1022&oq=el+sotano+panama&aqs=chrome..69i57j46i175i199i512.2543j0j9&sourceid=chrome&ie=UTF-8
 
+#data
+https://en.wikipedia.org/wiki/ISAM
+https://en.wikipedia.org/wiki/Triplestore
 
+#fungi
+https://es.wikipedia.org/wiki/Pleurotus_ostreatus
+
+#bracelet craft
+https://www.researchgate.net/publication/336852654_Elastic_Polyester
+https://en.wikipedia.org/wiki/Stress%E2%80%93strain_curve
+https://en.wikipedia.org/wiki/Glass_transition
+https://www.youtube.com/watch?v=gIA9WBSsXCA
+https://en.wikipedia.org/wiki/Wire_rope

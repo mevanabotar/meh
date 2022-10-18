@@ -1,0 +1,9 @@
+
+https://stackoverflow.com/questions/11865085/out-of-a-git-console-how-do-i-execute-a-batch-file-and-then-return-to-git-conso
+https://superuser.com/questions/1142397/how-to-run-windows-command-prompt-utilities-options-in-git-bash-how-to-specify
+https://superuser.com/questions/1314743/how-do-i-open-a-new-git-bash-terminal-window-at-my-current-location-in-windows
+https://stackoverflow.com/questions/32793782/git-bash-open-command-windows
+https://stackoverflow.com/questions/61969007/git-bash-in-windows-terminal-is-opening-in-a-separate-window
+
+https://lapetitnoisette.com/2021/03/12/how-to-make-homemade-nigari-and-gypsum-salt-extracted-from-seawater-%E6%B5%B7%E6%B0%B4%E3%81%8B%E3%82%89%E3%81%AB%E3%81%8C%E3%82%8A%E3%82%92%E6%8A%BD%E5%87%BA%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95/
+
